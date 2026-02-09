@@ -26,7 +26,6 @@ export default function App() {
           const selectedMeal = MEALS.find((meal) => meal.id === mealId);
 
           function headerButtonHandler() {
-            console.log("Favorite pressed for:", mealId);
           }
 
           return {
