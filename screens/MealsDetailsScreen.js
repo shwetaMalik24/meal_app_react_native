@@ -1,43 +1,55 @@
 import { View, Text, Image, StyleSheet, ScrollView, Button } from "react-native";
 import { MEALS } from "../data/dummy-data";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useContext, useCallback } from "react";
 import IconButton from "../components/IconButton";
+import { FavoritesContext } from "../store/context/favourite_context";
 
 
 function MealDetailScreen({ route, navigation }) {
+    const favouriteMealContext = useContext(FavoritesContext);
     const mealId = route.params.mealId;
+    const isMealFavourite = favouriteMealContext.ids.includes(mealId);
     const selectedMeal = MEALS.find(
         (meal) => meal.id === mealId
     );
+    console.log("IDS:", favouriteMealContext.ids);
+    console.log("isMealFavourite:", isMealFavourite);
 
-    function buttonPressed() {
-        console.log("button pressed!!");
+    function changeFavouriteStatusHandler() {
+        console.log("pressed");
+        if (isMealFavourite) {
+            favouriteMealContext.removeFavourite(mealId);
+        } else {
+            favouriteMealContext.addFavourite(mealId);
+        }
     }
+
 
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
                 <IconButton
-                    icon="star"
+                    icon={isMealFavourite ? "star" : "star-outline"}
                     color="black"
                     size={24}
-                    onPress={buttonPressed}
+                    onPress={changeFavouriteStatusHandler}
                 />
             ),
         });
-    }, [navigation, buttonPressed]);
+    }, [navigation, isMealFavourite, changeFavouriteStatusHandler]);
+
 
     return (
         <ScrollView>
             <View style={styles.container}>
                 <Image source={{ uri: selectedMeal.imageUrl }} style={styles.image} />
-                <Text style={styles.title}>{selectedMeal.title}</Text>,
+                <Text style={styles.title}>{selectedMeal.title}</Text>
                 <View style={styles.details}>
                     <Text style={styles.detailsItem}>{selectedMeal.duration}m</Text>
                     <Text style={styles.detailsItem}>{selectedMeal.complexity.toUpperCase()}</Text>
                     <Text style={styles.detailsItem}>{selectedMeal.affordability.toUpperCase()}</Text>
-                </View>,
-                <Text style={styles.title}>Ingredients</Text>,
+                </View>
+                <Text style={styles.title}>Ingredients</Text>
                 <View style={styles.ingredientsContainer}>
                     {selectedMeal.ingredients.map((ingredient) => (
                         <Text key={ingredient} style={styles.ingredientText}>
